@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Bad Habits</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: eine ruhige Spalte, jede Gewohnheit als Karte mit großer Live-Uhr und Meilenstein-Leiste */
+:root{
+  --bg:#edf1f2; --surface:#ffffff; --fg:#14232b; --muted:#5d6f78; --line:#d6dfe2;
+  --accent:#1f6f8b; --accent-soft:#d8eaf0; --warn:#b24a3a; --warn-soft:#f6e1dc;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Figtree", system-ui, -apple-system, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f181d; --surface:#17232a; --fg:#e4eef1; --muted:#90a4ad; --line:#26363e;
+  --accent:#5fb3cf; --accent-soft:#1c3440; --warn:#e8806e; --warn-soft:#3a2420; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f181d; --surface:#17232a; --fg:#e4eef1; --muted:#90a4ad; --line:#26363e;
+  --accent:#5fb3cf; --accent-soft:#1c3440; --warn:#e8806e; --warn-soft:#3a2420; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:640px;margin:0 auto;padding-block:32px 64px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:flex;flex-direction:column;gap:24px}
+header h1{font-family:var(--f-display);font-weight:700;font-size:2.4rem;letter-spacing:-.02em;margin:0;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted)}
+.add{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px;grid-template-columns:1fr 1fr auto;align-items:end}
+.add label{display:flex;flex-direction:column;gap:4px;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:0}
+input{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:9px 14px;cursor:pointer}
+.primary{background:var(--accent);color:var(--surface)}
+.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.ghost:hover{color:var(--fg)}
+.danger{background:var(--warn);color:var(--surface)}
+.list{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.name{font-family:var(--f-display);font-weight:500;font-size:1.3rem;margin:0;min-width:0;overflow-wrap:anywhere}
+.since{color:var(--muted);font-size:.85rem}
+.ex{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}
+.clock{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.clock .days{font-size:2.8rem;line-height:1;color:var(--accent)}
+.unit{display:flex;flex-direction:column}
+.unit small{font-family:var(--f-body);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:4px}
+.unit span{font-size:1.5rem;line-height:1.4}
+.unit.big span{font-size:2.8rem;line-height:1;color:var(--accent)}
+.ms{display:flex;flex-direction:column;gap:6px}
+.ms-row{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
+.bar{height:8px;background:var(--accent-soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .6s}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:.72rem;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.chip.done{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:600}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.stats{font-size:.8rem;color:var(--muted)}
+.confirm{background:var(--warn-soft);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.9rem}
+.confirm span{flex:1 1 180px}
+.empty{text-align:center;color:var(--muted);padding:32px 16px;border:1px dashed var(--line);border-radius:14px}
+.note{font-size:.78rem;color:var(--muted);text-align:center}
+@media (max-width:520px){.add{grid-template-columns:1fr}.clock .unit.big span{font-size:2.3rem}}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Bad Habits</h1>
+    <p>Was du hinter dir lässt und seit wann.</p>
+  </header>
+
+  <form class="add" id="addForm">
+    <label for="habitName">Gewohnheit
+      <input id="habitName" placeholder="z. B. Rauchen, Energy-Drinks" maxlength="60" required>
+    </label>
+    <label for="habitStart">Aufgehört am
+      <input id="habitStart" type="datetime-local" required>
+    </label>
+    <button class="primary" type="submit">Hinzufügen</button>
+  </form>
+
+  <div class="list" id="list"></div>
+  <p class="note" id="note">Sync wird verbunden …</p>
+</div>
+
+<script>
+const KEY = "losgelassen.v1";
+const MILESTONES = [1,3,7,14,30,60,90,180,365,730,1095];
+let pending = null; // {id, type}
+let habits = [];
+let col = null;      // db collection when sync is available
+let ready = false;   // first data arrived
+
+function loadLocal(){
+  try{ const raw = localStorage.getItem(KEY); if(raw) return JSON.parse(raw).filter(h => !h.example); }catch(e){}
+  return [];
+}
+function saveLocal(){ if(col) return; try{ localStorage.setItem(KEY, JSON.stringify(habits)); }catch(e){} }
+function setNote(t){ document.getElementById("note").textContent = t; }
+function showError(){ setNote("Speichern hat nicht geklappt. Prüfe deine Verbindung und versuche es noch einmal."); }
+
+// Writes: to the synced store when available, otherwise this browser
+async function putHabit(h){
+  if(!col){ saveLocal(); return; }
+  const {id, ...body} = h;
+  try{ await col.doc(id).set(body); }catch(e){ showError(); }
+}
+async function removeHabit(id){
+  if(!col){ saveLocal(); return; }
+  try{ await col.doc(id).delete(); }catch(e){ showError(); }
+}
+
+async function init(){
+  let db = null, user = null;
+  try{ [db, user] = await Promise.all([claude.use("db"), claude.use("user")]); }catch(e){}
+  const uid = user ? await user.id() : null;
+  if(!db || !uid){
+    habits = loadLocal(); ready = true; render();
+    setNote("Sync ist hier nicht verfügbar. Deine Daten bleiben nur in diesem Browser gespeichert.");
+    return;
+  }
+  col = db.collection("data/users/" + uid);
+  let migrated = false;
+  col.onSnapshot(async snap => {
+    const remote = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    // Einmalig: Einträge aus der alten, nur lokalen Version übernehmen
+    if(!migrated){
+      migrated = true;
+      const local = loadLocal();
+      if(!remote.length && local.length){
+        for(const h of local) await putHabit(h);
+        try{ localStorage.removeItem(KEY); }catch(e){}
+        return;
+      }
+    }
+    habits = remote;
+    if(pending && !habits.some(h => h.id === pending.id)) pending = null;
+    ready = true; render();
+  }, () => setNote("Verbindung zum Sync unterbrochen. Lade die Seite neu, um es erneut zu versuchen."));
+  setNote("Wird automatisch auf allen Geräten synchronisiert, auf denen du mit deinem Claude-Konto angemeldet bist.");
+}
+
+const pad = n => String(n).padStart(2,"0");
+const fmtDate = t => new Date(t).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+function split(ms){
+  const s = Math.max(0, Math.floor(ms/1000));
+  return {d:Math.floor(s/86400), h:Math.floor(s%86400/3600), m:Math.floor(s%3600/60), s:s%60};
+}
+function msLabel(days){ return days>=365 ? (days/365)+" J" : days+" T"; }
+function durText(ms){ const p = split(ms); return p.d ? `${p.d} Tage` : `${p.h} Std ${p.m} Min`; }
+
+function render(){
+  const list = document.getElementById("list");
+  if(!ready){ list.innerHTML = `<div class="empty">Deine Gewohnheiten werden geladen …</div>`; return; }
+  habits.sort((a,b) => b.start - a.start); // kürzeste Dauer zuerst
+  if(!habits.length){
+    list.innerHTML = `<div class="empty">Noch nichts eingetragen. Füge oben die erste Gewohnheit hinzu, von der du losgekommen bist.</div>`;
+    return;
+  }
+  list.innerHTML = habits.map(h => `
+    <article class="card" data-id="${h.id}">
+      <div class="top">
+        <h2 class="name">${esc(h.name)}${h.example?'<span class="ex">Beispiel</span>':''}</h2>
+        <span class="since">seit ${fmtDate(h.start)}</span>
+      </div>
+      <div class="clock">
+        <div class="unit big"><span data-f="d">0</span><small>Tage</small></div>
+        <div class="unit"><span data-f="h">00</span><small>Std</small></div>
+        <div class="unit"><span data-f="m">00</span><small>Min</small></div>
+        <div class="unit"><span data-f="s">00</span><small>Sek</small></div>
+      </div>
+      <div class="ms">
+        <div class="ms-row"><span data-f="next"></span><span data-f="pct"></span></div>
+        <div class="bar"><i data-f="bar"></i></div>
+        <div class="chips" data-f="chips"></div>
+      </div>
+      ${pending && pending.id===h.id ? confirmHtml(pending.type) : `
+      <div class="actions">
+        <span class="stats" data-f="stats"></span>
+        <span style="display:flex;gap:8px">
+          <button class="ghost" data-act="reset">Rückfall</button>
+          <button class="ghost" data-act="delete">Löschen</button>
+        </span>
+      </div>`}
+    </article>`).join("");
+  tick();
+}
+function confirmHtml(type){
+  return type==="reset"
+    ? `<div class="confirm"><span>Zähler auf jetzt zurücksetzen? Deine Bestzeit bleibt gespeichert.</span>
+       <button class="danger" data-act="doReset">Zurücksetzen</button><button class="ghost" data-act="cancel">Abbrechen</button></div>`
+    : `<div class="confirm"><span>Diese Gewohnheit endgültig entfernen?</span>
+       <button class="danger" data-act="doDelete">Löschen</button><button class="ghost" data-act="cancel">Abbrechen</button></div>`;
+}
+function esc(s){ return s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function tick(){
+  const now = Date.now();
+  document.querySelectorAll(".card").forEach(card => {
+    const h = habits.find(x => x.id === card.dataset.id); if(!h) return;
+    const ms = now - h.start, p = split(ms);
+    const f = n => card.querySelector(`[data-f="${n}"]`);
+    f("d").textContent = p.d; f("h").textContent = pad(p.h); f("m").textContent = pad(p.m); f("s").textContent = pad(p.s);
+    const daysF = ms/864e5;
+    const next = MILESTONES.find(x => x > daysF);
+    const prev = [...MILESTONES].reverse().find(x => x <= daysF) || 0;
+    if(next){
+      const pct = Math.min(100, (daysF-prev)/(next-prev)*100);
+      f("next").textContent = `Nächstes Ziel: ${next} ${next===1?"Tag":"Tage"} · noch ${durText((next-daysF)*864e5)}`;
+      f("pct").textContent = Math.floor(pct)+" %";
+      f("bar").style.width = pct+"%";
+    } else { f("next").textContent = "Alle Ziele erreicht"; f("pct").textContent = "100 %"; f("bar").style.width = "100%"; }
+    const chips = MILESTONES.map(x => `<span class="chip${daysF>=x?" done":""}">${msLabel(x)}</span>`).join("");
+    if(f("chips").innerHTML !== chips) f("chips").innerHTML = chips;
+    const st = f("stats");
+    if(st) st.textContent = `Bestzeit: ${durText(Math.max(h.best||0, ms))} · Rückfälle: ${h.resets||0}`;
+  });
+}
+
+document.getElementById("list").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-act]"); if(!btn) return;
+  const id = btn.closest(".card").dataset.id, h = habits.find(x => x.id===id), act = btn.dataset.act;
+  if(act==="reset" || act==="delete"){ pending = {id, type:act}; }
+  else if(act==="cancel"){ pending = null; }
+  else if(act==="doReset"){
+    const now = Date.now(); h.best = Math.max(h.best||0, now-h.start); h.start = now; h.resets = (h.resets||0)+1; pending = null; putHabit(h);
+  } else if(act==="doDelete"){ habits = habits.filter(x => x.id!==id); pending = null; removeHabit(id); }
+  render();
+});
+
+const startInput = document.getElementById("habitStart");
+function setNowDefault(){ const d = new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); startInput.value = d.toISOString().slice(0,16); }
+setNowDefault();
+
+document.getElementById("addForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = document.getElementById("habitName").value.trim();
+  const start = new Date(startInput.value).getTime();
+  if(!name || isNaN(start)) return;
+  const h = {id: "h"+Date.now(), name, start: Math.min(start, Date.now()), best:0, resets:0, created: Date.now()};
+  habits.unshift(h); ready = true;
+  putHabit(h); e.target.reset(); setNowDefault(); render();
+});
+
+render();
+init();
+setInterval(tick, 1000);
+</script>
+
+</body>
+</html>
