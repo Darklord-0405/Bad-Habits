@@ -65,6 +65,13 @@ button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:9px 14px;
 .stats{font-size:.8rem;color:var(--muted)}
 .confirm{background:var(--warn-soft);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.9rem}
 .confirm span{flex:1 1 180px}
+.confirm.relapse{flex-direction:column;align-items:stretch}
+.confirm.relapse > span,.confirm .when{flex:none}
+.confirm .when{display:flex;flex-direction:column;gap:4px;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.confirm .when input{background:var(--surface)}
+.confirm .err{color:var(--warn);font-weight:600;font-size:.85rem}
+.confirm.relapse button{align-self:flex-start}
+.confirm.relapse .btns{display:flex;gap:8px;flex-wrap:wrap}
 .empty{text-align:center;color:var(--muted);padding:32px 16px;border:1px dashed var(--line);border-radius:14px}
 .note{font-size:.78rem;color:var(--muted);text-align:center}
 @media (max-width:520px){.add{grid-template-columns:1fr}.clock .unit.big span{font-size:2.3rem}}
@@ -182,7 +189,7 @@ function render(){
         <div class="bar"><i data-f="bar"></i></div>
         <div class="chips" data-f="chips"></div>
       </div>
-      ${pending && pending.id===h.id ? confirmHtml(pending.type) : `
+      ${pending && pending.id===h.id ? confirmHtml(pending.type, h) : `
       <div class="actions">
         <span class="stats" data-f="stats"></span>
         <span style="display:flex;gap:8px">
@@ -193,10 +200,16 @@ function render(){
     </article>`).join("");
   tick();
 }
-function confirmHtml(type){
+function toLocalInput(t){ const d = new Date(t); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,16); }
+function confirmHtml(type, h){
   return type==="reset"
-    ? `<div class="confirm"><span>Zähler auf jetzt zurücksetzen? Deine Bestzeit bleibt gespeichert.</span>
-       <button class="danger" data-act="doReset">Zurücksetzen</button><button class="ghost" data-act="cancel">Abbrechen</button></div>`
+    ? `<div class="confirm relapse">
+         <span>Wann war der Rückfall? Der Zähler startet ab diesem Zeitpunkt neu, deine Bestzeit bleibt gespeichert.</span>
+         <label class="when" for="relapse-${h.id}">Datum und Uhrzeit
+           <input id="relapse-${h.id}" type="datetime-local" value="${toLocalInput(Date.now())}" min="${toLocalInput(h.start)}" max="${toLocalInput(Date.now())}">
+         </label>
+         <span class="err" data-f="err" hidden></span>
+         <div class="btns"><button class="danger" data-act="doReset">Rückfall eintragen</button><button class="ghost" data-act="cancel">Abbrechen</button></div></div>`
     : `<div class="confirm"><span>Diese Gewohnheit endgültig entfernen?</span>
        <button class="danger" data-act="doDelete">Löschen</button><button class="ghost" data-act="cancel">Abbrechen</button></div>`;
 }
@@ -231,7 +244,15 @@ document.getElementById("list").addEventListener("click", e => {
   if(act==="reset" || act==="delete"){ pending = {id, type:act}; }
   else if(act==="cancel"){ pending = null; }
   else if(act==="doReset"){
-    const now = Date.now(); h.best = Math.max(h.best||0, now-h.start); h.start = now; h.resets = (h.resets||0)+1; pending = null; putHabit(h);
+    const card = btn.closest(".card"), input = card.querySelector(`#relapse-${id}`), err = card.querySelector('[data-f="err"]');
+    const when = new Date(input.value).getTime(), now = Date.now();
+    let msg = "";
+    if(isNaN(when)) msg = "Bitte Datum und Uhrzeit angeben.";
+    else if(when > now + 60000) msg = "Der Rückfall kann nicht in der Zukunft liegen.";
+    else if(when < h.start) msg = `Der Rückfall muss nach dem Start liegen (${fmtDate(h.start)}).`;
+    if(msg){ err.textContent = msg; err.hidden = false; return; }
+    const at = Math.min(when, now);
+    h.best = Math.max(h.best||0, at-h.start); h.start = at; h.resets = (h.resets||0)+1; pending = null; putHabit(h);
   } else if(act==="doDelete"){ habits = habits.filter(x => x.id!==id); pending = null; removeHabit(id); }
   render();
 });

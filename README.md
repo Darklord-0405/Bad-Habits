@@ -5,7 +5,7 @@ Quit-Habit-App: Gewohnheiten eintragen, von denen man losgekommen ist, und live 
 ## Funktionen
 - Live-Zähler in Tagen, Stunden, Minuten und Sekunden
 - Meilensteine von 1 Tag bis 3 Jahre mit Fortschrittsbalken
-- Rückfall-Button, der den Zähler zurücksetzt; Bestzeit und Anzahl der Rückfälle bleiben erhalten
+- Rückfall mit frei wählbarem Datum und Uhrzeit eintragen (z. B. von gestern); Bestzeit und Anzahl der Rückfälle bleiben erhalten
 - Sortierung nach Dauer, die kürzeste zuerst
 
 ## Nutzung
